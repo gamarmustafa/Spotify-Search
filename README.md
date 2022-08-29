@@ -4,6 +4,6 @@ This project uses Spotify API and  Client Credentials OAuth flow. HTTP request a
 
 Check out the link below:
 
-[Spotify API](https://developer.spotify.com/documentation/web-api/quick-start/)
-[Client Credentials Flow](https://developer.spotify.com/documentation/general/guides/authorization/client-credentials/)
+[Spotify API](https://developer.spotify.com/documentation/web-api/quick-start/)                
+[Client Credentials Flow](https://developer.spotify.com/documentation/general/guides/authorization/client-credentials/)          
 [Retrofit](https://github.com/square/retrofit)
