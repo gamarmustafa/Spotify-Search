@@ -1,4 +1,5 @@
-### An app that helps you to find the artists' top tracks by searching their name.(other options will be available soon)
+### An app that helps you to find the artists' top tracks by searching their name.
+(other options will be available soon)
 
 This project uses Spotify API and  Client Credentials OAuth flow. HTTP request are done in Retrofit.                                                                      
 Check out the links below:
