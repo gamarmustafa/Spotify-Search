@@ -1,68 +1,64 @@
 package com.spotifysearch
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
-import com.spotifysearch.databinding.SearchLayoutBinding
-import com.spotifysearch.search.SearchArtist
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.spotifysearch.databinding.ActivityResultBinding
 import com.spotifysearch.toptracks.TopTrack
 import retrofit.*
 
-
-const val BASE_URL = "https://api.spotify.com/v1/artists/"
-const val TOKEN_URL = "https://accounts.spotify.com/"
-const val SEARCH_URL = "https://api.spotify.com"
-
-class MainActivity : AppCompatActivity() {
-    lateinit var binding: SearchLayoutBinding
-
-
+class ResultActivity : AppCompatActivity() {
+    lateinit var binding: ActivityResultBinding
+    private var adapter: TopTrackAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        binding = SearchLayoutBinding.inflate(layoutInflater)
+        binding = ActivityResultBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        binding.btnSearch.setOnClickListener {
-            val searchText = binding.searchView.query.toString()
-            getToken(searchText)
-        }
+        val bundle:Bundle? = intent.extras
+        val id:String = bundle!!.getString("id").toString()
+        getToken(id)
 
 
     }
 
-    fun searchArtist(token:String, artist:String) {
-        val retrofit: Retrofit = Retrofit.Builder().baseUrl(SEARCH_URL)
+    private fun setUpRV(id:String,token:String) {
+        val retrofit: Retrofit = Retrofit.Builder().baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create()).build()
         val service: TopTrackApi = retrofit.create(TopTrackApi::class.java)
-        val listCall: Call<SearchArtist> = service.getArtist(": Bearer "+token,artist, "artist")
-        listCall.enqueue(object : Callback<SearchArtist> {
-            override fun onResponse(response: Response<SearchArtist>?, retrofit: Retrofit?) {
-                if (response?.body() != null){
-                    Log.i("result!", response.body().artists.items[0].id)
-                    val intent = Intent(this@MainActivity, ResultActivity::class.java)
-                    intent.putExtra("id", response.body().artists.items[0].id)
-                    startActivity(intent)
 
+
+        Log.i("Token",token)
+        Log.i("id",token)
+        binding.progressBar.isVisible = true
+        val listCall: Call<TopTrack> = service.getTopTracks(id+"/top-tracks?market=ES",": Bearer "+token)
+
+        listCall.enqueue(object : Callback<TopTrack> {
+            override fun onResponse(response: Response<TopTrack>?, retrofit: Retrofit?) {
+                if (response?.body() != null) {
+                    binding.progressBar.isVisible = false
+                    adapter = TopTrackAdapter(response.body().tracks)
+                    binding.rv.adapter = adapter
+                    binding.rv.layoutManager = LinearLayoutManager(this@ResultActivity)
                 }
                 if(response?.body() == null){
                     Log.i("Code" , response!!.code().toString())
-                    Log.i("Response! ", "null response body /searchArtist function")
+                    Log.i("Response! ", "null response body /setUp function")
                 }
+
             }
 
             override fun onFailure(t: Throwable?) {
+                binding.progressBar.isVisible = false
                 Log.e("Error", t!!.message.toString())
             }
 
-
-        }
-        )
-
-
+        })
     }
-    private fun getToken(searchedArtist:String) {
+
+    private fun getToken(id:String) {
         val retrofit: Retrofit = Retrofit.Builder().baseUrl(TOKEN_URL)
             .addConverterFactory(GsonConverterFactory.create()).build()
         val service : TopTrackApi = retrofit.create(TopTrackApi::class.java)
@@ -73,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         listCall.enqueue(object : Callback<Token> {
             override fun onResponse(response: Response<Token>?, retrofit: Retrofit?) {
                 if (response?.body() != null) {
-                    searchArtist(response.body().access_token,searchedArtist)
+                    setUpRV(id,response.body().access_token)
                 }
                 if(response?.body() == null){
                     Log.i("Response!", "null response body /getToken")

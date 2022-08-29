@@ -1,5 +1,6 @@
 package com.spotifysearch
 
+import com.spotifysearch.search.SearchArtist
 import com.spotifysearch.toptracks.TopTrack
 import retrofit.*
 import retrofit.http.*
@@ -7,11 +8,19 @@ import retrofit.http.*
 interface TopTrackApi {
     @Headers(
         "Accept: application/json",
-        "Content-Type: application/json")
-       // "Authorization: Bearer BQC7bsTTGHOeh-IrXJwP4HD5RR3JKThFwH1iYXbBRZnklPez2CyCfai_o9q2Hk_piCEZqFCeoYXfFFdxil5Le0ln1W-7cJOMB4RljDq_JjIv3-bqeZU"
+        "Content-Type: application/json"
+    )
+    @GET
+    fun getTopTracks(@Url url: String, @Header("Authorization") token1: String): Call<TopTrack>
 
-    @GET("7bu3H8JO7d0UbMoVzbo70s/top-tracks?market=ES")
-    fun getTopTracks(@Header("Authorization") token1 :String): Call<TopTrack>
+
+    @GET("/v1/search")
+    fun getArtist(
+        @Header("Authorization") token2: String,
+        @Query("q") q: String,
+        @Query("type") type: String
+    ): Call<SearchArtist>
+
 
     @POST("api/token")
     @FormUrlEncoded
