@@ -21,7 +21,6 @@ class ResultActivity : AppCompatActivity() {
         val id:String = bundle!!.getString("id").toString()
         getToken(id)
 
-
     }
 
     private fun setUpRV(id:String,token:String) {
@@ -29,9 +28,8 @@ class ResultActivity : AppCompatActivity() {
             .addConverterFactory(GsonConverterFactory.create()).build()
         val service: TopTrackApi = retrofit.create(TopTrackApi::class.java)
 
-
         Log.i("Token",token)
-        Log.i("id",token)
+        Log.i("id",id)
         binding.progressBar.isVisible = true
         val listCall: Call<TopTrack> = service.getTopTracks(id+"/top-tracks?market=ES",": Bearer "+token)
 
